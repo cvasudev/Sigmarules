@@ -1,0 +1,42 @@
+title: Detection for DEV-0586
+id: 
+status: test
+description:  Destructive malware targeting Ukrainian organizations
+author: Vasudev
+references:
+  - https://www.microsoft.com/security/blog/2022/01/15/destructive-malware-targeting-ukrainian-organizations/
+date: 2022/01/15
+logsource:
+  product: antivirus
+detection:
+  selection_1:
+    -Signature|contains:
+      - DoS:Win32/WhisperGate.A!dha
+      - DoS:Win32/WhisperGate.C!dha
+      - DoS:Win32/WhisperGate.H!dha
+      - DoS:Win32/WhisperGate.X!dha
+  selection_2:
+    -Filename|contains:
+      - stage1.exe
+      - stage2.exe
+  selection_3:
+    -Hash|contains:
+      - a196c6b8ffcb97ffb276d04f354696e2391311db3841ae16c8c9f56f36a38e92
+      - dcbbae5a1c61dbbbb7dcd6dc5dd1eb1169f5329958d38b58c3fd9384081c9b78
+  selection_4:
+    -commandline|contains|all:
+      - '/Q /c start c:\stage1.exe'
+      - '/Q /c start c:\perflogs\stage1.exe'
+      - '/Q /c start c:\programdata\stage1.exe'
+      - '/Q /c start c:\temp\stage1.exe'
+  condition: selection_1 OR selection_2 OR selection_3 OR selection_4
+fields:
+  - FileName
+  - User
+  - Startdate
+  - Enddate
+falsepositives:
+  - Unlikely
+level: critical
+tags:
+
